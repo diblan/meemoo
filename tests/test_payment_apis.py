@@ -19,7 +19,7 @@ def test_create_payment_request_api():
     assert body["status"] == "PENDING"
     assert body["amount_in_cents"] == 999
     assert body["currency"] == "EUR"
-    assert body["valid_till"] > datetime.now() + timedelta(hours=23)
+    assert datetime.fromisoformat(body["valid_till"]) > datetime.now() + timedelta(hours=23)
 
 def test_create_payment_attempt_api():
     request_payload = {
