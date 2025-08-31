@@ -15,3 +15,24 @@ class PaymentService:
     @staticmethod
     def read_payment_request(id):
         return PaymentRequestRepository.find_by_id(id)
+
+    @staticmethod
+    def create_payment_attempt(data):
+        now = datetime.now()
+        request = PaymentRequestRepository.find_by_id(data.requester_id)
+        if not request:
+            raise HTTPException(status_code=404, detail="Payment request not found")
+
+        if request["status"] != "PENDING":
+            raise HTTPException(status_code=400, detail="Payment request is not pending")
+
+        if datetime.fromisoformat(request["valid_till"]) < datetime.now():
+            PaymentRequestRepository.update_status(request["id"], "EXPIRED")
+            raise HTTPException(status_code=400, detail="Payment request has expired")
+
+        attempt = PaymentAttemptRepository.create(
+            data.payer_id, data.requester_id, data.amount_in_cents, data.currency, now
+        )
+
+        PaymentRequestRepository.update_status(request["id"], "COMPLETED")
+        return attempt

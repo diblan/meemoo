@@ -27,3 +27,11 @@ class PaymentRequestRepository:
         row = cursor.fetchone()
         connection.close()
         return dict(row) if row else None
+
+    @staticmethod
+    def update_status(request_id, status):
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute("UPDATE payment_request SET status=? WHERE id=?", (status, request_id))
+        connection.commit()
+        connection.close()

@@ -3,6 +3,8 @@ from services.payment_service import PaymentService
 from models.payment_models import (
     PaymentRequestCreate,
     PaymentRequest,
+    PaymentAttemptCreate,
+    PaymentAttempt,
 )
 
 router = APIRouter()
@@ -15,6 +17,6 @@ async def get_payment_request(id: str):
 async def create_payment_request(req: PaymentRequestCreate):
     return PaymentService.create_payment_request(req)
 
-@router.post("/payment_attempts")
-async def create_payment_attempt():
-    return {"Coming soon in your neighbourhood!"}
+@router.post("/payment_attempts", response_model=PaymentAttempt)
+def create_payment_attempt(attempt: PaymentAttemptCreate):
+    return PaymentService.create_payment_attempt(attempt)
